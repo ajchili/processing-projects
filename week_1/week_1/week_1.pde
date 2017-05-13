@@ -35,7 +35,7 @@ void draw() {
   
   fill(0, 0, 0, 10);
   noStroke();
-  rect(10, 15, 125, 35);
+  rect(10, 15, 130, 35);
   fill(0);
   text("Circle count: " + circles.size(), 15, 30);
   text("Connection count: " + lines.size(), 15, 45);
@@ -53,9 +53,22 @@ void keyPressed() {
   }
 }
 
+void mouseMoved() {
+  boolean canEnable = true;
+  for (Circle circle : circles) {
+    if (mouseX <= (circle.getX() + circle.getSize()) && mouseX >= (circle.getX() - circle.getSize()) && mouseY <= (circle.getY() + circle.getSize()) && mouseY >= (circle.getY() - circle.getSize()) && canEnable) {
+      circle.setHovering(true);
+      canEnable = false;
+    } else {
+      circle.setHovering(false);
+    }
+  }
+}
+
 class Circle {
   private float x, y, xStep, yStep;
   private int size, dir;
+  private boolean isHovering = false;
   private color c = color((int)  random(0, 254), (int)  random(0, 254), (int) random(0, 254), (int) random(10, 100));
   
   public Circle(float x, float y, int size) {
@@ -76,6 +89,12 @@ class Circle {
     noStroke();
     ellipse(x, y, size, size);
     rect(x - size / 8, y - size / 8, size / 4, size / 4);
+    
+    if (isHovering) {
+      fill(0);
+      stroke(0);
+      text("X: " + (int) x + "\nY: " + (int) y + "\nSpeed: " + (abs(xStep) + abs(yStep)), x, y);
+    }
   }
   
   public void move() {
@@ -88,6 +107,10 @@ class Circle {
     }
   }
   
+  public void setHovering(boolean isHovering) {
+    this.isHovering = isHovering; 
+  }
+  
   public float getX() {
     return x;
   }
@@ -96,8 +119,16 @@ class Circle {
     return y; 
   }
   
+  public int getSize() {
+    return size; 
+  }
+  
   public float getDistance(float x, float y) {
     return dist(this.x, this.y, x, y);
+  }
+  
+  public boolean isHovering() {
+    return isHovering; 
   }
 }
 
