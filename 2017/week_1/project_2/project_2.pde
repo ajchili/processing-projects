@@ -196,10 +196,10 @@ class PongGame {
         generateMovement();
       }
       
-      if (x - (SIZE / 2) <= 10 && x - (SIZE / 2) >= 0 || x + (SIZE / 2) >= 590 &&  x + (SIZE / 2) <= 600) {
-        if (p1Paddle.getY() - 30 <= y + 10 && p1Paddle.getY() + 30 >= y - 10) {
+      if (x - (SIZE / 2) <= 10 && x >= 0 || x + (SIZE / 2) >= 590 && x <= 600) {
+        if (p1Paddle.getY() - 30 <= y + (SIZE / 2) && p1Paddle.getY() + 30 >= y - (SIZE / 2)) {
           xStep = abs(xStep);
-        } else if (p2Paddle.getY() - 30 <= y + 10 && p2Paddle.getY() + 30 >= y - 10) {
+        } else if (p2Paddle.getY() - 30 <= y + (SIZE / 2) && p2Paddle.getY() + 30 >= y - (SIZE / 2)) {
           xStep = abs(xStep) * -1;
         }
       }
