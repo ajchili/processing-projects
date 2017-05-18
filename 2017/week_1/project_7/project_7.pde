@@ -1,9 +1,9 @@
 ArrayList<Point> points = new ArrayList<Point>();
+ArrayList<Triangle> triangles = new ArrayList<Triangle>();
 
 void setup() {
   size(500, 500);
-  frameRate(60);
-  loop();
+  frameRate(30);
 }
 
 void draw() {
@@ -25,8 +25,14 @@ boolean allPointsUsed() {
   
   return true;
 }
+  
+public boolean isTriangleCreateable(Point p1, Point p2, Point p3) {
+  return !(p1.equals(p2) || p1.equals(p3) || p2.equals(p3));
+}
 
 void reset() {
+  triangles.clear();
+  
   for (Point point : points) {
     point.setUsage(false);
   }
@@ -34,22 +40,56 @@ void reset() {
 
 void mosaic() {
   reset();
-  ArrayList<Triangle> triangles = new ArrayList<Triangle>();
   
   if (points.size() == 2) {
     fill(random(0, 255));
     noStroke();
     line(points.get(0).getX(), points.get(0).getY(), points.get(1).getX(), points.get(1).getY());
   } else if (points.size() > 2) {
-    while (!allPointsUsed()) {
-      for (Point point : points) {
-        
+    while (!allPointsUsed() && triangles.size() <= (points.size() - 2)) {
+      for (Point p1 : points) {
+        if (!p1.getUsage()) {
+          for (Point p2 : points) {
+            for (Point p3 : points) {
+              if (triangles.size() > 0) {
+                boolean isCreateable = true;
+                for (Triangle triangle : triangles) {
+                  if (triangle.equals(new Triangle(p1, p2, p3))) {
+                    isCreateable = false;
+                    break;
+                  }
+                }
+                  
+                if (isCreateable) {
+                  if (isTriangleCreateable(p1, p2, p3)) {
+                    triangles.add(new Triangle(p1, p2, p3));
+                    p1.setUsage(true);
+                    p2.setUsage(true);
+                    p3.setUsage(true);
+                  }
+                }
+              } else {
+                if (isTriangleCreateable(p1, p2, p3)) {
+                  triangles.add(new Triangle(p1, p2, p3));
+                  p1.setUsage(true);
+                  p2.setUsage(true);
+                  p3.setUsage(true);
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
   
+  while(triangles.size() > 1 && triangles.size() > (points.size() - 2)) {
+    triangles.remove(0);
+  }
+  
   for (Triangle triangle : triangles) {
     triangle.draw();
+    println(triangle.toString());
   }
 }
 
@@ -82,6 +122,10 @@ class Point {
   
   public boolean equals(Point point) {
     return x == point.getX() && y == point.getY();
+  }
+  
+  public String toString() {
+    return "(" + x + ", " + y + ")";
   }
   
   public boolean getUsage() {
@@ -118,11 +162,21 @@ class Triangle {
   }
   
   public boolean equals(Triangle triangle) {
-    return p1.equals(triangle.getPoint(1)) && p2.equals(triangle.getPoint(2)) && p3.equals(triangle.getPoint(3));
+    boolean arg0 = p1.equals(triangle.getPoint(1)) && p2.equals(triangle.getPoint(2)) && p3.equals(triangle.getPoint(3));
+    boolean arg1 = p1.equals(triangle.getPoint(1)) && p2.equals(triangle.getPoint(3)) && p3.equals(triangle.getPoint(2));
+    boolean arg2 = p1.equals(triangle.getPoint(2)) && p2.equals(triangle.getPoint(1)) && p3.equals(triangle.getPoint(3));
+    boolean arg3 = p1.equals(triangle.getPoint(2)) && p2.equals(triangle.getPoint(3)) && p3.equals(triangle.getPoint(1));
+    boolean arg4 = p1.equals(triangle.getPoint(3)) && p2.equals(triangle.getPoint(1)) && p3.equals(triangle.getPoint(2));
+    boolean arg5 = p1.equals(triangle.getPoint(3)) && p2.equals(triangle.getPoint(2)) && p3.equals(triangle.getPoint(1));
+    return arg0 && arg1 && arg2 && arg3 && arg4 && arg5;
+  }
+  
+  public String toString() {
+    return "This triangle has points at [" + p1.toString() + ", " + p2.toString() + ", " + p3.toString() + "]";
   }
   
   void draw() {
-    fill(random(0, 255));
+    fill(random(0, 255), random(0, 255), random(0, 255));
     noStroke();
     triangle(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
   }
