@@ -3,7 +3,7 @@ ArrayList<Triangle> triangles = new ArrayList<Triangle>();
 
 void setup() {
   size(500, 500);
-  frameRate(30);
+  frameRate(1);
 }
 
 void draw() {
@@ -18,7 +18,7 @@ void draw() {
 
 boolean allPointsUsed() {
   for (Point point : points) {
-    if (!point.getUsage()) {
+    if (point.getUsage() == 0) {
       return false;
     }
   }
@@ -27,14 +27,14 @@ boolean allPointsUsed() {
 }
   
 public boolean isTriangleCreateable(Point p1, Point p2, Point p3) {
-  return !(p1.equals(p2) || p1.equals(p3) || p2.equals(p3));
+  return !(p1.equals(p2) || p1.equals(p3) || p2.equals(p3) || p1.getUsage() > 2 || p2.getUsage() > 2 || p3.getUsage() > 2);
 }
 
 void reset() {
   triangles.clear();
   
   for (Point point : points) {
-    point.setUsage(false);
+    point.setUsed(0);
   }
 }
 
@@ -48,7 +48,7 @@ void mosaic() {
   } else if (points.size() > 2) {
     while (!allPointsUsed() && triangles.size() <= (points.size() - 2)) {
       for (Point p1 : points) {
-        if (!p1.getUsage()) {
+        if (p1.getUsage() < 2) {
           for (Point p2 : points) {
             for (Point p3 : points) {
               if (triangles.size() > 0) {
@@ -63,17 +63,17 @@ void mosaic() {
                 if (isCreateable) {
                   if (isTriangleCreateable(p1, p2, p3)) {
                     triangles.add(new Triangle(p1, p2, p3));
-                    p1.setUsage(true);
-                    p2.setUsage(true);
-                    p3.setUsage(true);
+                  p1.setUsed();
+                  p2.setUsed();
+                  p3.setUsed();
                   }
                 }
               } else {
                 if (isTriangleCreateable(p1, p2, p3)) {
                   triangles.add(new Triangle(p1, p2, p3));
-                  p1.setUsage(true);
-                  p2.setUsage(true);
-                  p3.setUsage(true);
+                  p1.setUsed();
+                  p2.setUsed();
+                  p3.setUsed();
                 }
               }
             }
@@ -89,7 +89,6 @@ void mosaic() {
   
   for (Triangle triangle : triangles) {
     triangle.draw();
-    println(triangle.toString());
   }
 }
 
@@ -112,12 +111,11 @@ void mousePressed() {
 class Point {
   
   private int x, y;
-  private boolean isInTriangle;
+  private int usage = 0;
   
   public Point(int x, int y) {
     this.x = x;
     this.y = y;
-    isInTriangle = false;
   }
   
   public boolean equals(Point point) {
@@ -128,8 +126,8 @@ class Point {
     return "(" + x + ", " + y + ")";
   }
   
-  public boolean getUsage() {
-    return isInTriangle; 
+  public int getUsage() {
+    return usage; 
   }
   
   void draw() {
@@ -138,8 +136,12 @@ class Point {
     ellipse(x, y, 5, 5);
   }
   
-  void setUsage(boolean isInTriangle) {
-    this.isInTriangle = isInTriangle; 
+  void setUsed() {
+    usage++; 
+  }
+  
+  void setUsed(int usage) {
+    this.usage = usage;
   }
   
   public int getX() {
